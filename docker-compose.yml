@@ -1,0 +1,36 @@
+services:
+  mosquitto-1:
+    build: 
+      context: ./services/mosquitto
+      dockerfile: Dockerfile
+    container_name: mqtt-one
+    restart: always
+    ports: 
+      - 1883:1883
+      - 9001:9001
+    volumes: 
+      - ./services/mosquitto/config/mosquitto-1.conf:/etc/mosquitto/mosquitto.conf
+      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
+    
+  mosquitto-2:
+    build: 
+      context: ./services/mosquitto
+      dockerfile: Dockerfile
+    container_name: mqtt-two
+    restart: always
+    ports: 
+      - 1884:1884
+      - 9004:9002
+    volumes: 
+      - ./services/mosquitto/config/mosquitto-2.conf:/etc/mosquitto/mosquitto.conf
+      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
+
+  redis: 
+    build: 
+      context: ./services/redis
+      dockerfile: Dockerfile
+    container_name: redis
+    restart: always
+    ports: 
+      - 6379:6379
+
