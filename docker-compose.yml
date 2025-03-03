@@ -1,36 +1,54 @@
 services:
-  mosquitto-1:
-    build: 
-      context: ./services/mosquitto
-      dockerfile: Dockerfile
-    container_name: mqtt-one
-    restart: always
-    ports: 
-      - 1883:1883
-      - 9001:9001
-    volumes: 
-      - ./services/mosquitto/config/mosquitto-1.conf:/etc/mosquitto/mosquitto.conf
-      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
-    
-  mosquitto-2:
-    build: 
-      context: ./services/mosquitto
-      dockerfile: Dockerfile
-    container_name: mqtt-two
-    restart: always
-    ports: 
-      - 1884:1884
-      - 9004:9002
-    volumes: 
-      - ./services/mosquitto/config/mosquitto-2.conf:/etc/mosquitto/mosquitto.conf
-      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
-
   redis: 
     build: 
       context: ./services/redis
       dockerfile: Dockerfile
     container_name: redis
-    restart: always
+    restart: unless-stopped
     ports: 
       - 6379:6379
+  mqtt-one:
+    build: 
+      context: ./services/mosquitto
+      dockerfile: Dockerfile
+    container_name: mqtt-one
+    restart: unless-stopped
+    ports: 
+      - 1884:1884
+      - 9002:9002
+    volumes: 
+      - ./services/mosquitto/config/mosquitto-1.conf:/etc/mosquitto/mosquitto.conf
+      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
+    networks:
+      - mqtt_network
+  mqtt-two:
+    build: 
+      context: ./services/mosquitto
+      dockerfile: Dockerfile
+    container_name: mqtt-two
+    restart: unless-stopped
+    ports: 
+      - 1885:1885
+      - 9003:9003
+    volumes: 
+      - ./services/mosquitto/config/mosquitto-2.conf:/etc/mosquitto/mosquitto.conf
+      - ./services/mosquitto/config/passwd:/etc/mosquitto/passwd
+    networks:
+      - mqtt_network
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy
+    restart: unless-stopped
+    ports:
+      - "1883:1883"  # MQTT Clients will connect to HAProxy at this port
+      - "9001:9001"
+    volumes:
+      - ./services/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - mqtt_network
+      
+networks:
+    mqtt_network:
+      driver: bridge
 
