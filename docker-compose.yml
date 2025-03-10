@@ -26,6 +26,9 @@ services:
       dockerfile: Dockerfile
     container_name: mqtt-one
     restart: unless-stopped
+    port: 
+      - "1884:1883"
+      - "9001:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
       - ./mosquitto/config/passwd:/etc/mosquitto/passwd
@@ -39,6 +42,9 @@ services:
       dockerfile: Dockerfile
     container_name: mqtt-two
     restart: unless-stopped
+    port: 
+      - "1885:1883"
+      - "9001:9001"
     volumes:
        - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
        - ./mosquitto/config/passwd:/etc/mosquitto/passwd
