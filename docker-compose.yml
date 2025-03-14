@@ -1,24 +1,4 @@
 services:
-
-  ### 🟢 Traefik Load Balancer
-  traefik:
-    image: traefik:v2.9
-    container_name: traefik
-    restart: unless-stopped
-    command:
-      - "--providers.docker=true"
-      - "--providers.file.filename=/etc/traefik/traefik.yaml"
-      - "--entrypoints.mqtt.address=:1883"
-      - "--entrypoints.ws.address=:9001"
-    ports:
-      - "1883:1883"  # Load Balanced MQTT Port
-      - "9001:9001"  # load Web socket
-    volumes:
-      - ./traefik/traefik.yaml:/etc/traefik/traefik.yaml
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - mqtt_network
-
   ### 🟢 Mosquitto MQTT Broker 1
   mqtt-one:
     build:
@@ -27,27 +7,12 @@ services:
     container_name: mqtt-one
     restart: unless-stopped
     ports: 
-      - "1884:1883"
-      - "9002:9001"
+      - "1883:1883"
+      - "9001:9001"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
       - ./mosquitto/config/passwd:/etc/mosquitto/passwd
-    networks:
-      - mqtt_network
-
-  ### 🟢 Mosquitto MQTT Broker 2
-  mqtt-two:
-    build:
-      context: ./mosquitto
-      dockerfile: Dockerfile
-    container_name: mqtt-two
-    restart: unless-stopped
-    ports: 
-      - "1885:1883"
-      - "9003:9001"
-    volumes:
-       - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
-       - ./mosquitto/config/passwd:/etc/mosquitto/passwd
+      - ./mosquitto/data:/etc/mosquitto/data
     networks:
       - mqtt_network
 
