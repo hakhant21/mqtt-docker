@@ -16,6 +16,22 @@ services:
     networks:
       - mqtt_network
 
+  mqtt-two:
+    build:
+      context: ./mosquitto
+      dockerfile: Dockerfile
+    container_name: mqtt-two
+    restart: unless-stopped
+    ports: 
+      - "1884:1884"
+      - "9002:9002"
+    volumes:
+      - ./mosquitto/config/mosquitto-2.conf:/etc/mosquitto/mosquitto.conf
+      - ./mosquitto/config/passwd:/etc/mosquitto/passwd
+      - ./mosquitto/data:/etc/mosquitto/data
+    networks:
+      - mqtt_network
+
   ### 🔴 Redis for Message Persistence
   redis:
     image: redis:alpine
